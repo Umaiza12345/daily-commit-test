@@ -2,25 +2,28 @@ name: Daily Commit Workflow
 
 on:
   schedule:
-    - cron: '15 1 * * *'  # runs daily at 01:15 UTC
+    - cron: '30 4 * * *' # Runs daily at 4:30 UTC (10:00 AM IST)
   workflow_dispatch:
 
 jobs:
-  daily-commit:
+  commit-job:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
+      - name: Checkout the repository
+        uses: actions/checkout@v3
 
-      - name: Set Git Identity - 23f2002978@ds.study.iitm.ac.in
+      - name: Add timestamp for 23f2002978@ds.study.iitm.ac.in
+        run: echo "Updated on $(date -u)" >> daily-log.txt
+
+      - name: Commit and push changes
         run: |
-          git config --global user.name "GitHub Action Bot"
+          git config --global user.name "github-actions[bot]"
           git config --global user.email "23f2002978@ds.study.iitm.ac.in"
-
-      - name: Make a daily commit
-        run: |
-          echo "Daily log: $(date -u)" >> daily-log.txt
           git add daily-log.txt
-          git commit -m "🤖 Daily update: $(date -u)" || echo "Nothing to commit"
+          git commit -m "Daily update - $(date -u)" || echo "No changes to commit"
           git push
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+
